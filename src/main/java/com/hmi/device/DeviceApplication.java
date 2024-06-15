@@ -6,8 +6,11 @@ import net.wimpi.modbus.msg.ReadInputDiscretesRequest;
 import net.wimpi.modbus.msg.ReadInputDiscretesResponse;
 import net.wimpi.modbus.msg.ReadInputRegistersRequest;
 import net.wimpi.modbus.msg.ReadInputRegistersResponse;
+import net.wimpi.modbus.msg.ReadMultipleRegistersRequest;
+import net.wimpi.modbus.msg.ReadMultipleRegistersResponse;
 import net.wimpi.modbus.net.TCPMasterConnection;
 import net.wimpi.modbus.procimg.InputRegister;
+import net.wimpi.modbus.procimg.Register;
 import net.wimpi.modbus.util.BitVector;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -40,7 +43,10 @@ public class DeviceApplication {
 			// Prepare a Modbus request
 			//ReadInputDiscretesRequest request = new ReadInputDiscretesRequest(0, 10);  // Read 10 discrete inputs starting from address 0
 
-			readInputRegistersRequest(transaction);
+			//readInputRegistersRequest(transaction);
+
+			readMultipleRegistersRequest(transaction);
+
 
 			//transaction.setRequest(request);
 			// Execute the transaction
@@ -62,6 +68,23 @@ public class DeviceApplication {
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+
+	private static void readMultipleRegistersRequest(ModbusTCPTransaction transaction) throws ModbusException {
+
+		ReadMultipleRegistersRequest request = new ReadMultipleRegistersRequest(0, 10);
+		request.setUnitID(1);
+		transaction.setRequest(request);
+		transaction.execute();
+		if(transaction.getResponse() instanceof ReadMultipleRegistersResponse){
+			ReadMultipleRegistersResponse response = (ReadMultipleRegistersResponse) transaction.getResponse();
+			Register[] registers = response.getRegisters();
+			int index = 0;
+			for (Register register: registers) {
+				System.out.println("index is : "+index +"value is: "+register.getValue());
+				index ++;
+			}
 		}
 	}
 
