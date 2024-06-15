@@ -67,7 +67,7 @@ public class DeviceApplication {
 
 	private static void readInputRegistersRequest(ModbusTCPTransaction transaction) throws ModbusException {
 		ReadInputRegistersRequest request = new ReadInputRegistersRequest(0,10);
-		request.setDataLength(8);
+		request.setDataLength(10);
 		request.setUnitID(1);
 		// Set the transaction request
 		transaction.setRequest(request);
