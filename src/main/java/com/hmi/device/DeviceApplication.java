@@ -2,16 +2,10 @@ package com.hmi.device;
 
 import net.wimpi.modbus.ModbusException;
 import net.wimpi.modbus.io.ModbusTCPTransaction;
-import net.wimpi.modbus.msg.ReadInputDiscretesRequest;
-import net.wimpi.modbus.msg.ReadInputDiscretesResponse;
-import net.wimpi.modbus.msg.ReadInputRegistersRequest;
-import net.wimpi.modbus.msg.ReadInputRegistersResponse;
 import net.wimpi.modbus.msg.ReadMultipleRegistersRequest;
 import net.wimpi.modbus.msg.ReadMultipleRegistersResponse;
 import net.wimpi.modbus.net.TCPMasterConnection;
-import net.wimpi.modbus.procimg.InputRegister;
 import net.wimpi.modbus.procimg.Register;
-import net.wimpi.modbus.util.BitVector;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -40,28 +34,8 @@ public class DeviceApplication {
 			// Create a Modbus TCP transaction
 			ModbusTCPTransaction transaction = new ModbusTCPTransaction(connection);
 
-			// Prepare a Modbus request
-			//ReadInputDiscretesRequest request = new ReadInputDiscretesRequest(0, 10);  // Read 10 discrete inputs starting from address 0
-
-			//readInputRegistersRequest(transaction);
-
 			readMultipleRegistersRequest(transaction);
 
-
-			//transaction.setRequest(request);
-			// Execute the transaction
-			//transaction.execute();
-
-			// Get the response
-//			if (transaction.getResponse() instanceof ReadInputDiscretesResponse) {
-//				ReadInputDiscretesResponse response = (ReadInputDiscretesResponse) transaction.getResponse();
-//				BitVector inputs = response.getDiscretes();
-//				// Process the response (print or manipulate the data as needed)
-//				for (int i = 0; i < inputs.size(); i++) {
-//					boolean state = inputs.getBit(i);
-//					System.out.println("Discrete Input " + i + " Value: " + state);
-//				}
-//			}
 			System.out.println("Closing connection...");
 			// Close the connection
 			connection.close();
@@ -82,31 +56,11 @@ public class DeviceApplication {
 			Register[] registers = response.getRegisters();
 			int index = 0;
 			for (Register register: registers) {
-				System.out.println("index "+index+" bytes "+register.toBytes()+
-						" short "+register.toShort()+
-						" short(unsigned) "+register.toUnsignedShort()+
-						"value: "+register.getValue());
+				String binaryString = Integer.toBinaryString(register.getValue() & 0xFFFF);
+				binaryString = String.format("%16s",binaryString).replace(' ', '0');
+				System.out.println("index "+index+"  "+binaryString);
 				index ++;
 			}
 		}
 	}
-
-	private static void readInputRegistersRequest(ModbusTCPTransaction transaction) throws ModbusException {
-		ReadInputRegistersRequest request = new ReadInputRegistersRequest(0,10);
-		request.setUnitID(1);
-		// Set the transaction request
-		transaction.setRequest(request);
-		// Execute the transaction
-		transaction.execute();
-		if (transaction.getResponse() instanceof ReadInputRegistersResponse) {
-			ReadInputRegistersResponse response = (ReadInputRegistersResponse) transaction.getResponse();
-			InputRegister[] inputs = response.getRegisters();
-			// Process the response (print or manipulate the data as needed)
-			for (int i = 0; i < inputs.length; i++) {
-				InputRegister register = inputs[i];
-				System.out.println("Register Input " + i + " Value: " + register.getValue());
-			}
-		}
-	}
-
 }
