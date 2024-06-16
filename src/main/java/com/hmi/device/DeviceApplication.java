@@ -82,7 +82,10 @@ public class DeviceApplication {
 			Register[] registers = response.getRegisters();
 			int index = 0;
 			for (Register register: registers) {
-				System.out.println("index is : "+index +"value is: "+register.getValue());
+				System.out.println("index "+index+" bytes "+register.toBytes()+
+						" short "+register.toShort()+
+						" short(unsigned) "+register.toUnsignedShort()+
+						"value: "+register.getValue());
 				index ++;
 			}
 		}
